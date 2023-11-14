@@ -15,10 +15,11 @@ app.use(bodyParser.json());
 
 // Set up the MySQL connection
 const pool = mysql.createPool({
-  host: 'localhost',
-  user: 'root', // Your MySQL username
-  password: 'your_password', // Your MySQL password
+  host: process.env.SERVER_HOST,
+  user: process.env.USER, // Your MySQL username
+  password: process.env.SERVER_PASSWORD, // Your MySQL password
   database: 'your_database_name', // Your MySQL database name
+  port: process.env.SERVER_PORT,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
@@ -50,7 +51,7 @@ app.get('/api/data', (req, res) => {
 });
 
 // Start the server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
