@@ -48,12 +48,12 @@ app.get('/api/data', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'paciente/main.html'));
+  res.sendFile(path.join(__dirname, 'public/login.html'));
 });
 app.get('/:url(*)', (req, res) => {
   let url = req.params.url
   console.log(url)
-  res.sendFile(path.join(__dirname, 'src', url));
+  res.sendFile(path.join(__dirname, 'public', url));
 });
 
 
