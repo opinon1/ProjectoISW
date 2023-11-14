@@ -1,3 +1,6 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
 name: Build and deploy Node.js app to Azure Web App - ISW-clientes
 
 on:
@@ -18,18 +21,11 @@ jobs:
         with:
           node-version: '18.x'
 
-      - name: Create .env file
-        run: |
-          echo "SERVER_HOST=${{ secrets.SERVER_HOST }}" >> .env
-          echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> .env
-          echo "SERVER_USER=${{ secrets.SERVER_USER }}" >> .env
-          echo "SERVER_PASSWORD=${{ secrets.SERVER_PASSWORD }}" >> .env
-          echo "PORT=${{ secrets.PORT }}" >> .env
-
       - name: npm install, build, and test
         run: |
           npm install
           npm run build --if-present
+          npm run test --if-present
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
@@ -56,5 +52,5 @@ jobs:
         with:
           app-name: 'ISW-clientes'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1189CC3231B54E4892DD4D7006183CB4 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0D7EAA8BC36E4CA8853BEFACBCB14E3D }}
           package: .
