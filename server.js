@@ -2,6 +2,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mysql = require('mysql2');
+const path = require('path');
 
 require('dotenv').config();
 
@@ -34,9 +35,7 @@ pool.getConnection((err, connection) => {
 });
 
 // Define a simple route
-app.get('/', (req, res) => {
-  res.send('Hello, World!');
-});
+
 
 // Define a test API to fetch data from MySQL
 app.get('/api/data', (req, res) => {
@@ -47,6 +46,17 @@ app.get('/api/data', (req, res) => {
     res.json({ data: results });
   });
 });
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src/paciente/main.html'));
+});
+app.get('/:url', (req, res) => {
+  let url = req.params.url
+  console.log(url)
+  res.sendFile(path.join(__dirname, 'src/', url));
+});
+
+
 
 // Start the server
 const PORT = process.env.PORT;
