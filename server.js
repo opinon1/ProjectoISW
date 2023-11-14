@@ -3,9 +3,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mysql = require('mysql2');
 
-//TODO
 
-//config .env file
+require('dotenv').config();
 
 // Create an Express application
 const app = express();
@@ -16,9 +15,9 @@ app.use(bodyParser.json());
 // Set up the MySQL connection
 const pool = mysql.createPool({
   host: process.env.SERVER_HOST,
-  user: process.env.USER, // Your MySQL username
+  user: process.env.SERVER_USER, // Your MySQL username
   password: process.env.SERVER_PASSWORD, // Your MySQL password
-  database: 'your_database_name', // Your MySQL database name
+  database: 'kokua', // Your MySQL database name
   port: process.env.SERVER_PORT,
   waitForConnections: true,
   connectionLimit: 10,
