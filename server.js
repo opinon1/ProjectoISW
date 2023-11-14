@@ -53,7 +53,7 @@ app.get('/', (req, res) => {
 app.get('/:url(*)', (req, res) => {
   let url = req.params.url
   console.log(url)
-  res.sendFile(path.join(__dirname, 'public/', url));
+  res.sendFile(path.join(__dirname, 'public/'+ url));
 });
 
 
