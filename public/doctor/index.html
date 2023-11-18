@@ -1,12 +1,155 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<body>
-<h1>
-    Hola doc
-</h1>
-
-</body>
-
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Patient</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <script src="persona_apoyo.js"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 </head>
+<body>
+  <div class="sidebar">
+    <div class="dots">
+      <h3> Kokua| Modo Doctor </h3>
+    </div>
+    <div class="profile">
+      <ion-icon name="person-outline"></ion-icon>
+    </div>
+    <ul>
+      <span>Main</span>
+      <li>
+        <a href="#homeContent"
+          ><ion-icon name="home-outline"></ion-icon>
+          <p>Home</p></a
+        >
+      </li>
+      <li>
+        <a href="#notifications"
+          ><ion-icon name="notifications-outline"></ion-icon>
+          <p>Notifications</p></a
+        >
+      </li>
+    </ul>
+    <ul>
+      <span>Content</span>
+      <li>
+        <a href="#patients"
+          ><ion-icon name="accessibility-outline"></ion-icon>
+          <p>Patients</p></a
+        >
+      </li>
+      <li class="likes">
+        <a href="#update"
+          ><ion-icon name="chatbubble-outline"></ion-icon>
+          <p>Update Medical Process</p></a
+        >
+      </li>
+    </ul>
+    <ul>
+      <span>Logout</span>
+      <li>
+        <a href="#"
+          ><ion-icon name="log-out-outline"></ion-icon>
+          <p>Logout</p></a
+        >
+      </li>
+    </ul>
+  </div>
+
+  <div class='main-content'>
+    <div id="homeContent" class="content">
+      <div class="main">
+        <div class="row">
+          <div class="col-sm-6 text-center">
+            <h4 class="display-4" style="font-weight: lighter;">¡Bienvenido Doctor!</h4>
+            <br>
+            <div class="jumbotron p-4 mx-auto w-50" style="background-color: #6275e6; color: #fff;">
+              <h1>SIGAMOS AYUDANDO</h1>
+              <h2 style="font-weight: lighter;">A TODO EL MUNDO</h2>
+            </div>
+            <br>
+            <div class="textoHospital">
+              <p class="textoH"><u>Tu dedicación ilumina caminos hacia la curación</u></p>
+              <p class="textoHU"><u>Eres la inspiración que guía la esperanza en cada diagnóstico</u></p>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <img src="https://d2lcsjo4hzzyvz.cloudfront.net/blog/wp-content/uploads/2019/12/Me%CC%81dico-atendiendo-a-una-sen%CC%83ora-de-edad.jpg" class="imgDoctor img-fluid">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="notifications" class="content">
+      <div class="main">
+        <div class="row">
+          <div class="col-sm-12 text-left">
+            <h1>Doctor Notifications</h1>
+            <p>Hola Doctor, aquí se muestran tus notificaciones.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class='main-content'>
+    <div id="patients" class="content">
+      <div class="main">
+        <div class="row">
+          <div class="col-sm-12 text-left">
+            <h1>Patients</h1>
+            <p>Hola Doctor, aquí se muestran tus pacientes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="update" class="content">
+      <div class="main">
+        <div class="row">
+          <div class="col-sm-12 text-left">
+            <h1>Update Medical Process</h1>
+            <p>Hola Doctor, aquí puedes actualizar el proceso médico de tus pacientes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+  </div>
+
+
+
+  <script>
+    // Script para manejar el cambio de hash y mostrar/ocultar el contenido correspondiente
+    document.addEventListener("DOMContentLoaded", function () {
+      // Manejar el cambio de hash
+      window.addEventListener("hashchange", function () {
+        // Ocultar todos los contenidos
+        var contents = document.querySelectorAll(".content");
+        contents.forEach(function (content) {
+          content.style.display = "none";
+        });
+
+        // Mostrar el contenido correspondiente al hash actual
+        var currentHash = window.location.hash.substring(1);
+        var currentContent = document.getElementById(currentHash);
+        if (currentContent) {
+          currentContent.style.display = "block";
+        }
+      });
+
+      // Simular el evento hashchange al cargar la página
+      var hashChangeEvent = new Event("hashchange");
+      window.dispatchEvent(hashChangeEvent);
+    });
+  </script>
+</body>
 </html>
