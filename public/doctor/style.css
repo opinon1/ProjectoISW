@@ -360,7 +360,74 @@ body {
   margin-bottom: 20px;
 }
 
+#profile .profile-info {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
 
+#profile .profile-image-container {
+  max-width: 200px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#profile .profile-image {
+  width: 100%;
+  height: auto;
+  border-radius: 50%;
+}
+
+#profile .profile-details p {
+  color: #495057;
+}
+
+#profile button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#profile button:hover {
+  background-color: #0056b3;
+}
+
+.profile-form {
+  display: none;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.profile-form label {
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.profile-form input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+  box-sizing: border-box;
+}
+
+.profile-form button {
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.profile-form button.cancel {
+  background-color: #6c757d;
+}
 
 /* Otros estilos según tus preferencias */
 

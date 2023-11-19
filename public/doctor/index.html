@@ -133,12 +133,58 @@
         <div class="row">
           <div class="col-sm-12 text-left">
             <h1><ion-icon name="person-circle-outline"></ion-icon> Doctor Profile</h1>
-            <p>Aquí puedes actualizar tu información de perfil.</p>
-            
+            <div class="profile-info">
+              <div class="profile-image-container">
+                <img class="profile-image" src="https://media.licdn.com/dms/image/C4E03AQHN8xgseevCiA/profile-displayphoto-shrink_800_800/0/1516517482014?e=2147483647&v=beta&t=j98hf-SQssBnepwI5c5S7tFsnoleqeiJuycdDPcVGrc" alt="Doctor Profile">
+              </div>
+              <div class="profile-details">
+                <p><strong>Nombre:</strong> Dr. Parecido</p>
+                <p><strong>Fecha de Nacimiento:</strong> 1988-01-01</p>
+                <p><strong>Doctorado:</strong> Especialidad en...</p>
+                <p><strong>Número de pacientes tratados:</strong> 200</p>
+                <p><strong>Lugar de atención:</strong> Hospital XYZ</p>
+                <p><strong>Estudios:</strong> Universidad ABC, Año de graduación</p>
+              </div>
+            </div>
+            <button onclick="editProfile()">Editar Perfil</button>
+
+            <!-- Formulario de edición de perfil -->
+            <form class="profile-form">
+              <label for="nombre">Nombre:</label>
+              <input type="text" id="nombre" name="nombre" value="Dr. Nombre Apellido">
+
+              <label for="fecha-nacimiento">Fecha de Nacimiento:</label>
+              <input type="date" id="fecha-nacimiento" name="fecha-nacimiento" value="1988-01-01">
+
+              <label for="doctorado">Doctorado:</label>
+              <input type="text" id="doctorado" name="doctorado" value="Especialidad en...">
+
+              <label for="num-pacientes">Número de pacientes tratados:</label>
+              <input type="text" id="num-pacientes" name="num-pacientes" value="200">
+
+              <label for="lugar-atencion">Lugar de atención:</label>
+              <input type="text" id="lugar-atencion" name="lugar-atencion" value="Hospital XYZ">
+
+              <label for="estudios">Estudios:</label>
+              <input type="text" id="estudios" name="estudios" value="Universidad ABC, Año de graduación">
+
+              <label for="imagen-perfil">Foto de Perfil:</label>
+              <input type="file" id="imagen-perfil" name="imagen-perfil" accept="image/*" onchange="previewImage()">
+
+              <div class="profile-image-container">
+                <img class="profile-image" id="preview" alt="Vista previa de la imagen">
+              </div>
+
+              <button type="button" onclick="saveProfile()">Guardar Cambios</button>
+              <button type="button" class="cancel" onclick="cancelEdit()">Cancelar</button>
+            </form>
           </div>
         </div>
       </div>
     </div>
+  
+  
+
 
   </div>
 
@@ -167,6 +213,38 @@
       var hashChangeEvent = new Event("hashchange");
       window.dispatchEvent(hashChangeEvent);
     });
+
+    function editProfile() {
+      // Oculta la información y muestra el formulario de edición
+      document.querySelector('.profile-info').style.display = 'none';
+      document.querySelector('.profile-form').style.display = 'block';
+    }
+
+    function saveProfile() {
+      // Lógica para guardar los cambios (puedes enviar los datos a un servidor, almacenarlos en localStorage, etc.)
+      // Aquí simplemente se vuelve a mostrar la información y se oculta el formulario
+      document.querySelector('.profile-info').style.display = 'flex';
+      document.querySelector('.profile-form').style.display = 'none';
+    }
+
+    function cancelEdit() {
+      // Cancela la edición, vuelve a mostrar la información y oculta el formulario
+      document.querySelector('.profile-info').style.display = 'flex';
+      document.querySelector('.profile-form').style.display = 'none';
+    }
+
+    function previewImage() {
+      // Muestra la vista previa de la imagen seleccionada
+      var input = document.getElementById('imagen-perfil');
+      var preview = document.getElementById('preview');
+
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+      };
+
+      reader.readAsDataURL(input.files[0]);
+    }
   </script>
 </body>
 </html>
