@@ -438,7 +438,9 @@ img {
 }
 
 input {
-  border-style: none;
+  border-color: #044599ba;
+  border-radius: 5px;
+  border-width: 1px;
 }
 
 .buton {
