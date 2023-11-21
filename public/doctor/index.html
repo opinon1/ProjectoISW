@@ -146,44 +146,58 @@
                 <p><strong>Estudios:</strong> Universidad ABC, Año de graduación</p>
               </div>
             </div>
-            <button onclick="editProfile()">Editar Perfil</button>
+            <a href="#editPerfil">
+              <button onclick="editProfile()">Editar Perfil</button>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
 
-            <!-- Formulario de edición de perfil -->
+    <div id="editPerfil" class="content">
+      <div class="main">
+        <div class="row">
+          <div class="col-sm-12 text-left">
             <form class="profile-form">
               <label for="nombre">Nombre:</label>
               <input type="text" id="nombre" name="nombre" value="Dr. Nombre Apellido">
-
+        
               <label for="fecha-nacimiento">Fecha de Nacimiento:</label>
               <input type="date" id="fecha-nacimiento" name="fecha-nacimiento" value="1988-01-01">
-
+        
               <label for="doctorado">Doctorado:</label>
               <input type="text" id="doctorado" name="doctorado" value="Especialidad en...">
-
+        
               <label for="num-pacientes">Número de pacientes tratados:</label>
               <input type="text" id="num-pacientes" name="num-pacientes" value="200">
-
+        
               <label for="lugar-atencion">Lugar de atención:</label>
               <input type="text" id="lugar-atencion" name="lugar-atencion" value="Hospital XYZ">
-
+        
               <label for="estudios">Estudios:</label>
               <input type="text" id="estudios" name="estudios" value="Universidad ABC, Año de graduación">
-
+        
               <label for="imagen-perfil">Foto de Perfil:</label>
               <input type="file" id="imagen-perfil" name="imagen-perfil" accept="image/*" onchange="previewImage()">
-
+        
               <div class="profile-image-container">
                 <img class="profile-image" id="preview" alt="Vista previa de la imagen">
               </div>
-
-              <button type="button" onclick="saveProfile()">Guardar Cambios</button>
-              <button type="button" class="cancel" onclick="cancelEdit()">Cancelar</button>
+              <a href="#profile">
+                <button type="button" class="cancel" onclick="cancelEdit()">Cancelar</button>
+              </a>
+              <a href="#profile">
+                <button type="button" onclick="saveProfile()">Guardar Cambios</button>
+              </a>
             </form>
           </div>
         </div>
       </div>
     </div>
+    
   
-  
+    
+    
 
 
   </div>
