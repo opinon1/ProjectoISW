@@ -1,6 +1,0 @@
-export * from './Home'
-export * from './LogOut'
-export * from './Notifications'
-export * from './Patients'
-export * from './Profile'
-export * from './UpdateProgress'
