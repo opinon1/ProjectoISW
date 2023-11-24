@@ -180,6 +180,10 @@ body {
   background-color: rgb(231, 231, 231);
 }
 
+.contactArea.hide {
+  display: none; /* Hide contacts that don't match the search term */
+}
+
 .contactArea h6{
   color: black; 
 }
@@ -204,6 +208,8 @@ body {
   background-color: rgb(206, 245, 255);
   width: 100%;
   height: 100%;
+  display: flex;
+  align-items: flex-start;
 }
 .chats{
   margin-top: 5%;
@@ -237,14 +243,19 @@ body {
   background-color: rgb(223, 255, 220);
   width:fit-content;
   border-radius: 23px;
-  margin-left: 10px;
+  text-align: right;
+  margin-left: 800px;
+  margin-bottom: 20px;
 }
+
 .MensajeReceptor{
   padding: 15px;
   background-color:rgb(238, 238, 238);
   width:fit-content;
   border-radius: 23px;
-  position: relative;
+  text-align: left;
+  margin-left: 20px;
+  margin-bottom: 20px;
 }
 
 #medicalProcess{
@@ -252,7 +263,7 @@ body {
 }
 #notifications
 {
-  display: none; 
+  display: none;
 }
 #clients{
   display:none;
@@ -322,6 +333,12 @@ body {
 } 
 .lineaNot{
   width: 100%;
+}
+.borrar{
+  background-color:red;
+  padding: 10px;
+  border: none;
+  border-radius: 75px;
 }
 
 /*-----------------home page------------------------*/

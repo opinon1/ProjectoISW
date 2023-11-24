@@ -109,7 +109,8 @@ const jsonContacts = [
     });
 
     //-----------------------------------Chat------------------------------------------------------------
-     const card = document.getElementsByClassName('contact');
+
+    const card = document.getElementsByClassName('contact');
      console.log(card);
      jsonContacts.forEach(element => {
         let hora = new Date(); 
@@ -199,71 +200,140 @@ const jsonContacts = [
         });
      });
 
+
+
      //-------------------------------Clientes----------------------------------------------------------------
-     const clientsArea = document.getElementById('clients'); 
-     let div = document.createElement('div'); 
-     let contador = 0; 
-     div.id = 'clientes';
-     jsonContacts.forEach(el =>{
-        const div1 = document.createElement('div');
-        const name = document.createElement('p'); 
-        const image = document.createElement('img'); 
-        name.innerText = el.name; 
-        image.src = el.image; 
-        name.className = 'clientName'; 
-        image.className = 'clientImage'; 
-        div1.appendChild(image); 
-        div1.appendChild(name); 
-        div1.className = "BloqueCliente";
-        if(contador >= 7)
-        {
-            contador = 0; 
-            clientsArea.appendChild(div);
-            div = document.createElement('div'); 
-            div.id = 'clientes';
-            div.appendChild(div1);
-        }
-        else{
-            div.appendChild(div1); 
-        }
-        contador++; 
-     });   
-     clientsArea.appendChild(div);
+     const clientsArea = document.getElementById('clients');
+     let div;
+     
+     jsonContacts.forEach((el, index) => {
+       if (index % 7 === 0) {
+         // Crea un nuevo contenedor después de cada 7 clientes
+         div = document.createElement('div');
+         div.id = 'clientes';
+         clientsArea.appendChild(div);
+       }
+     
+       const div1 = document.createElement('div');
+       const name = document.createElement('p');
+       const image = document.createElement('img');
+       name.innerText = el.name;
+       image.src = el.image;
+       name.className = 'clientName';
+       image.className = 'clientImage';
+     
+       image.addEventListener('click', function () {
+         const clienteWindow = window.open('', '_blank', 'width=400,height=400,scrollbars=yes,resizable=yes');
+         clienteWindow.document.write(`
+           <html>
+             <head>
+               <title>${el.name}</title>
+               <link rel="stylesheet" href="style.css" />
+             </head>
+             <body>
+               <div class="BloqueCliente">
+                 <h1>${el.name}</h1>
+                 <img src="${el.image}" alt="${el.name}" />
+                 <!-- Puedes agregar más elementos para mostrar otros detalles del cliente si es necesario -->
+               </div>
+             </body>
+           </html>
+         `);
+       });
+     
+       div1.appendChild(image);
+       div1.appendChild(name);
+       div1.className = 'BloqueCliente';
+       div.appendChild(div1);
+     });
+     
 
      //---------------------------Notifications----------------------------------------------------------------
-     const notificationArea = document.getElementById('notifications'); 
-     notifications.forEach(el =>{
-        const line = document.createElement('hr');
-        line.className = "lineaNot";
-        const divTituloMensaje  = document.createElement('div'); 
-        divTituloMensaje.className = "notificacionTituloDescripcion"; 
-        const divHora = document.createElement('div'); 
-        divHora.className = "divHoraNotificacion"; 
-        const divNotification = document.createElement('div'); 
-        divNotification.className = "divNotificacion"; 
-        const point = document.createElement('div');
-        point.className = "ponitNotificacion";
+     const notificationArea = document.getElementById('notifications');
 
-        const notification = document.createElement('p');
-        notification.innerText = el.notification; 
-        notification.className = "titleNotification"; 
-        const time = document.createElement('p');
-        time.innerText = el.time;  
-        time.className = "timeNotification"; 
-        const description = document.createElement('p');
-        description.innerText = el.description; 
-        description.className = "descriptionNotification"; 
+     notifications.forEach(el => {
+       const line = document.createElement('hr');
+       line.className = 'lineaNot';
+       const divTituloMensaje = document.createElement('div');
+       divTituloMensaje.className = 'notificacionTituloDescripcion';
+       const divHora = document.createElement('div');
+       divHora.className = 'divHoraNotificacion';
+       const divNotification = document.createElement('div');
+       divNotification.className = 'divNotificacion';
+       const point = document.createElement('div');
+       point.className = 'ponitNotificacion';
+   
+       const notification = document.createElement('p');
+       notification.innerText = el.notification;
+       notification.className = 'titleNotification';
+       const time = document.createElement('p');
+       time.innerText = el.time;
+       time.className = 'timeNotification';
+       const description = document.createElement('p');
+       description.innerText = el.description;
+       description.className = 'descriptionNotification';
+   
+       const botonBorrar = document.createElement('button');
+       botonBorrar.innerText = 'Borrar notificacion';
+       botonBorrar.className = 'borrar';
+   
+       divTituloMensaje.appendChild(point);
+       divTituloMensaje.appendChild(notification);
+       divTituloMensaje.appendChild(description);
+       divHora.appendChild(time);
+       divNotification.appendChild(divTituloMensaje);
+       divNotification.appendChild(divHora);
+       divNotification.appendChild(botonBorrar);  // Agrega el botón Borrar a la notificación
+       notificationArea.appendChild(line);
+       notificationArea.appendChild(divNotification);
+       notificationArea.appendChild(line);
+   
+       // Agrega el evento 'click' al botón de Borrar dentro de cada notificación
+       botonBorrar.addEventListener('click', function(event) {
+         // Elimina la notificación al hacer clic en el botón de borrar
+         divNotification.remove();
+       });
+     });
+   
+     
+// Utiliza querySelectorAll para obtener una lista de elementos con la clase 'notificacion'
+let notif = document.querySelectorAll('.notificacions');
+const notificacion = document.getElementsByClassName('.divNotificacion');
 
-        divTituloMensaje.appendChild(point); 
-        divTituloMensaje.appendChild(notification);
-        divTituloMensaje.appendChild(description); 
-        divHora.appendChild(time); 
-        divNotification.appendChild(divTituloMensaje); 
-        divNotification.appendChild(divHora); 
-        notificationArea.appendChild(line);
-        notificationArea.appendChild(divNotification); 
-        notificationArea.appendChild(line);
-     }); 
+// Itera sobre cada elemento de la lista
+
+    // Agrega el evento 'click' al elemento '.borrar' dentro de cada notificación
+    notif.querySelector('.borrar').addEventListener('click', function(event) { 
+        // Elimina la notificación al hacer clic en el botón de borrar
+            for (let i = 0; i < notificacion.length; i++) {
+                const notificaciones = notificacion[i];
+              
+                // Borra todos los hijos del elemento
+                while (notificaciones.firstChild) {
+                  notificaciones.removeChild(notificaciones.firstChild);
+                }
+              }
+    });
+
+
+
+     //-------------------------Busqueda---------------------------------------------
+/*      const searchInput = document.getElementsByClassName('searchBar');
+     const contacts = document.getElementsByClassName('contactArea');
+     
+     searchInput.addEventListener('keyup', (event) => {
+       const searchTerm = event.target.value.toLowerCase();
+     
+       for (let i = 0; i < contacts.length; i++) {
+         const contactName = contacts[i].querySelector('h6').textContent.toLowerCase();
+     
+         if (contactName.includes(searchTerm)) {
+           contacts[i].style.display = 'block';
+         } else {
+           contacts[i].style.display = 'none';
+         }
+       }
+     }); */
 
 });
 
