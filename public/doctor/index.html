@@ -16,14 +16,35 @@
         <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
         <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 
-        <script src="persona_apoyo.js"></script>
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+        <!--Cripto -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
     
     </head>
 
+    <!--Generador de HASH -->
+    <script>
+        const cyrb53 = (str, seed = 0) => {
+            let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+            for(let i = 0, ch; i < str.length; i++) {
+                ch = str.charCodeAt(i);
+                h1 = Math.imul(h1 ^ ch, 2654435761);
+                h2 = Math.imul(h2 ^ ch, 1597334677);
+            }
+            h1  = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+            h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+            h2  = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+            h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
         
+            return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+        };
+    </script>
+
+        
+    <!--Contenido visible-->
     <body>
 
         <!--Barra de navegacion-->
@@ -48,7 +69,7 @@
                 <li>
                     <a href="#notifications">
                         <ion-icon name="notifications-outline"></ion-icon>
-                        <p>Notifications</p>
+                        <p>Avisos</p>
                     </a>
                 </li>
             </ul>
@@ -125,6 +146,169 @@
                                 Mis notificaciones
                             </h1>
                             <p>Hola Doctor, aquí se muestran tus notificaciones.</p>
+                            <br>
+
+                            <h3>
+                                <ion-icon name="calendar-outline"></ion-icon>
+                                Mis citas
+                            </h3>
+                            <br>
+
+                            <button class="collapseButton" data-toggle="collapse" data-target="#appointmentFormCointainer">Nueva cita</button>
+                            <div id="appointmentFormCointainer" class="collapse">
+                                <form id="appointmentForm" class="appointmentForm">
+                                    <label>ID Paciente: &emsp;</label>
+                                    <input id="Citas-ID_Paciente" type="text" placeholder="ID del paciente">
+                                    <br>
+                                    <label>Fecha: &emsp;</label>
+                                    <input id="Citas-Fecha" type="date">
+                                    <br>
+                                    <label>Tipo: &emsp;</label>
+                                    <input id="Citas-Tipo" type="text" placeholder="Tipo de la cita">
+                                    <br>
+                                    <div class="d-flex justify-content-between">
+                                        <p id="Citas-Mensaje" class="warningMessage"></p>
+                                        <button type="button" onclick="newAppointment()">Crear cita</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div id="Appointments" class="col-sm-12 text-left" style="max-height: 250px; overflow-y: scroll;">
+                                <br>
+
+                                <!--Carga y muestra las citas-->
+                                <script>
+
+                                    const doctorID = ""     //Falta como obtenerlo al momento de hacer el log-in
+                                    const campos = "c.IDCita, c.TipoCita, c.EstatusCita, c.Fecha, p.Nombre, p.Apellido"
+                                    const query= `SELECT ${campos} FROM citas c, pacientes p  WHERE 
+                                    c.IDPaciente=p.IDPaciente AND c.IDDoctor=${doctorID};`
+
+                                    //Señalan a donde debe añadir las nuevas citas
+                                    const container = document.getElementById("Appointments")
+                                    const appointmentCointainerClass = "card"
+                                    const cardWidth = 800
+
+                                    const myAppointments = [
+                                        ["1", "Revision", "Por confirmar", "2023-01-01", "Roberto", "Jimenez"],
+                                        ["2", "Cirujia", "Confirmada", "2023-01-05", "Ana", "Gutierrez"],
+                                        ["3", "Tratamiento", "Postergada", "2023-01-10", "Jose", "Gonzalez"]
+                                    ]   //Falta fetch de las citas
+
+                                    const newAppointment = () =>{
+                                        
+                                        //Para insertar mensajes de error 
+                                        const formularioCita = document.getElementById("appointmentForm")
+                                        
+                                        //Controladores de los inputs
+                                        const patientID = document.getElementById("Citas-ID_Paciente")
+                                        const date = document.getElementById("Citas-Fecha")
+                                        const type = document.getElementById("Citas-Tipo")
+
+                                        //Controlador del mensaje de error
+                                        const errorMessage = document.getElementById("Citas-Mensaje")
+
+                                        //Si los campos estan llenos
+                                        if(patientID.value && date.value && type.value){
+
+                                            //Falta verificar la info de la BD para saber si existe el paciente 
+                                            const checkIDquery = `SELECT nombre, apellido FROM pacientes WHERE IDPaciente=${patientID.value};`
+                                            const exists = 1 
+
+                                            //Si existe el paciente
+                                            if(exists){
+
+                                                errorMessage.innerHTML = ""
+
+                                                const ID = cyrb53(patientID.value + doctorID.value + type.value);
+
+                                                //Falta insertarlo en la BD
+                                                const query = `INSERT INTO citas VALUES(${ID}, ${patientID.value}, ${doctorID}, ${type.value}, "Por confirmar", ${date.value});`
+                                    
+                                                
+                                                const newAppointment = document.createElement("div");
+                                                newAppointment.className = appointmentCointainerClass
+                                                newAppointment.style = `width: ${cardWidth}px`
+                                                newAppointment.id = "Cita-" + ID
+                                                newAppointment.innerHTML = `
+                                                    <div class="d-flex justify-content-around" style="width:${cardWidth}px">
+                                                        <p style="width:${cardWidth/5}px">Jose Jimenez</p> 
+                                                        <p style="width:${cardWidth/5}px">${date.value}</p>
+                                                        <p style="width:${cardWidth/5}px">${type.value}</p>
+                                                        <p style="width:${cardWidth/5}px">Por confirmar</p>
+                                                        <button onclick="deleteAppointment(${ID})" class="cancelButton">Cancelar cita</button>
+                                                    </div>
+                                                `;
+
+                                                container.appendChild(newAppointment)
+
+                                                //Borra los valores de la 
+                                                patientID.value = ""
+                                                date.value = ""
+                                                type.value = ""
+                                            }
+                                            else {
+                                                errorMessage.innerHTML = "No existe un paciente con el ID: " + patientID.value
+                                            }
+
+                                        } 
+                                        else {
+                                            errorMessage.innerHTML = "Rellene todos los campos"
+                                        }
+                                    }
+
+                                    const deleteAppointment = (appointmentID) => {
+                                        const query = `DELETE FROM citas WHERE IDCita=${appointmentID};`    //Falta ejecutar el query
+
+                                        /*
+                                        fetch()
+                                            .then()
+                                            .then()
+                                        */
+
+                                        const child = document.getElementById("Cita-" + appointmentID)
+                                        container.removeChild(child)
+                                    }
+
+                                    const loadAppointments = (appointments) => {
+                                        appointments.map(( appointment )=>{
+
+                                            const patientDiv = document.createElement("div");
+                                            patientDiv.className = appointmentCointainerClass
+                                            patientDiv.style = `width: ${cardWidth}px`
+                                            patientDiv.id = "Cita-" + appointment[0]
+                                            patientDiv.innerHTML = `
+                                                <div class="d-flex justify-content-around" style="width:${cardWidth}px">
+                                                    <p style="width:${cardWidth/5}px">${appointment[4] + " " + appointment[5]}</p> 
+                                                    <p style="width:${cardWidth/5}px">${appointment[3]}</p>
+                                                    <p style="width:${cardWidth/5}px">${appointment[1]}</p>
+                                                    <p style="width:${cardWidth/5}px">${appointment[2]}</p>
+                                                    <button onclick="deleteAppointment(${appointment[0]})" class="cancelButton">Cancelar cita</button>
+                                                </div>
+                                                    `;
+                                            container.appendChild(patientDiv);
+                                        })
+                                    }
+
+                                    loadAppointments(myAppointments)
+
+                                </script>
+
+                            </div>
+                            <br>
+                            <br>
+
+                            <h3>
+                                <ion-icon name="bookmarks-outline"></ion-icon>
+                                Mis eventos
+                            </h3>
+                            <br>
+
+                            <div id="Events" class="col-sm-12 text-left">
+                                <p>Hola</p>
+                            </div>
+                            <br>
+
                         </div>
                     </div>
                 </div>
@@ -146,6 +330,58 @@
                                 Mis pacientes
                             </h1>
                             <p>Hola Doctor, aquí se muestran tus pacientes.</p>
+                            <br>
+
+                            <h3>
+                                <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+                                Mis chats
+                            </h3>
+
+                            <div id="myPatients" class="chat-list" style="width: 400px;height: 400px;overflow-y: scroll;">
+
+                                <!--Get patients and create containers for each one-->
+                                <script>
+                                    const doctorPatients = [
+                                        ["0123","Roberto", "Martinez", "Cancer", "Etapa 1"],
+                                        ["0124","Jorge", "Martinez", "Hepatitis", "Curado"],
+                                        ["0125","Daniela", "Martinez", "Hipertension", "En revision"]
+                                    ];  //Falta fetch de los pacientes
+                                    const clientContainerClass = "chat-box"
+
+                                    const loadPatients = (patients) => {
+
+                                        const container = document.getElementById("myPatients");
+
+                                        for(let i = 0; i < patients.length; i++){
+                                            const patientDiv = document.createElement("div");
+                                            patientDiv.className = clientContainerClass
+                                            patientDiv.innerHTML = `
+                                            <div class="chat-details">
+                                                <div class="text-head">
+                                                    <h4> ${patients[i][1] + " " + patients[i][2]} </h4>
+                                                    <p class="time unread">11:49</p>
+                                                </div>
+                                                <div class="text-message">
+                                                    <p>${patients[i][3] + ": " + patients[i][4]}</p>
+                                                </div>
+                                            </div>
+                                            `;
+                                            container.appendChild(patientDiv);
+                                        }
+                                    };
+
+                                    loadPatients(doctorPatients);
+
+                                </script>
+
+                            </div>
+
+                            <div>
+
+                            </div>
+                                
+                            
+
                         </div>
                     </div>
                 </div>
@@ -305,11 +541,6 @@
 
             reader.readAsDataURL(input.files[0]);
             }
-            
-            const myFunc = () =>{
-                console.log("Error")
-            }
-
         </script>
 
     </body>
