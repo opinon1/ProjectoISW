@@ -65,7 +65,7 @@
             <ul>
                 <span>Principal</span>
                 <li>
-                    <a href="#homeContent">
+                    <a href="./index.html#homeContent">
                         <ion-icon name="home-outline"></ion-icon>
                         <p>Inicio</p>
                     </a>
@@ -168,7 +168,10 @@
                                     <input id="Citas-Fecha" type="date">
                                     <br>
                                     <label>Tipo: &emsp;</label>
-                                    <input id="Citas-Tipo" type="text" placeholder="Tipo de la cita">
+                                    <select id="Citas-Tipo">
+                                        <option value="Estandar">Estandar</option>
+                                        <option value="DePrueba">DePrueba</option>
+                                      </select>
                                     <br>
                                     <div class="d-flex justify-content-between">
                                         <p id="Citas-Mensaje" class="warningMessage"></p>
@@ -189,148 +192,173 @@
                                     <p style="width: 160px;"></p>
                                 </div>
 
-                                <!--Carga y muestra las citas-->
-                                <script>
-
-                                    const doctorID = ""     //Falta como obtenerlo al momento de hacer el log-in
-
-                                    //Señalan a donde debe añadir las nuevas citas
-                                    const container = document.getElementById("Appointments")
-                                    const appointmentCointainerClass = "card"
-                                    const cardWidth = 800
-
-                                    let myAppointments = [
-                                        ["1", "Revision", "Por confirmar", "2023-01-01", "Roberto", "Jimenez"],
-                                        ["2", "Cirujia", "Confirmada", "2023-01-05", "Ana", "Gutierrez"],
-                                        ["3", "Tratamiento", "Postergada", "2023-01-10", "Jose", "Gonzalez"]
-                                    ]   //Falta fetch de las citas
-
-                                    const newAppointment = async() =>{
-                                        
-                                        //Para insertar mensajes de error 
-                                        const formularioCita = document.getElementById("appointmentForm")
-                                        
-                                        //Controladores de los inputs
-                                        const patientID = document.getElementById("Citas-ID_Paciente")
-                                        const date = document.getElementById("Citas-Fecha")
-                                        const type = document.getElementById("Citas-Tipo")
-
-                                        //Controlador del mensaje de error
-                                        const errorMessage = document.getElementById("Citas-Mensaje")
-
-                                        //Si los campos estan llenos
-                                        if(patientID.value && date.value && type.value){
-
-                                            //Falta verificar la info de la BD para saber si existe el paciente 
-                                            const endpoint1 = "/"
-                                            //const exists =  axios.get(endpoint1)
-                                            const exists = 1
-
-                                            //Si existe el paciente
-                                            if(exists){
-
-                                                errorMessage.innerHTML = ""
-
-                                                const ID = cyrb53(patientID.value + doctorID.value + type.value);
-
-                                                //Falta insertarlo en la BD
-                                                const endpoint2 = "/"
-                                                //await axios.post(endpoint2, {}})
-                                                
-                                                const newAppointment = document.createElement("div");
-                                                newAppointment.className = appointmentCointainerClass
-                                                newAppointment.style = `width: ${cardWidth}px`
-                                                newAppointment.id = "Cita-" + ID
-                                                newAppointment.innerHTML = `
-                                                    <div class="d-flex justify-content-around" style="width:${cardWidth}px">
-                                                        <p style="width:${cardWidth/5}px">Jose Jimenez</p> 
-                                                        <p style="width:${cardWidth/5}px">${date.value}</p>
-                                                        <p style="width:${cardWidth/5}px">${type.value}</p>
-                                                        <p style="width:${cardWidth/5}px">Por confirmar</p>
-                                                        <button onclick="deleteAppointment(${ID})" class="cancelButton">Cancelar cita</button>
-                                                    </div>
-                                                `;
-
-                                                container.appendChild(newAppointment)
-
-                                                //Borra los valores de la 
-                                                patientID.value = ""
-                                                date.value = ""
-                                                type.value = ""
+                                    <!--Carga y muestra las citas-->
+                                    <script>
+                        
+                                        //Señalan a donde debe añadir las nuevas citas
+                                        const container = document.getElementById("Appointments");
+                                        const appointmentCointainerClass = "card";
+                                        const cardWidth = 800;
+                        
+                                        const appointmentURL = "/api/doctor/appointments/:id";
+                                        const idDoctor = 1; // El ID que quieres usar
+                                        const updateAppointmentURL = appointmentURL.replace(
+                                        ":id",
+                                        idDoctor
+                                        );
+                        
+                                        function loadJSON(url) {
+                                        return fetch(url)
+                                            .then((response) => {
+                                            if (!response.ok) {
+                                                throw new Error(`Error de red: ${response.status}`);
                                             }
-                                            else {
-                                                errorMessage.innerHTML = "No existe un paciente con el ID: " + patientID.value
-                                            }
-
-                                        } 
-                                        else {
-                                            errorMessage.innerHTML = "Rellene todos los campos"
-                                        }
-                                    }
-
-                                    const deleteAppointment = async(appointmentID) => {
-                                        
-                                        /* For DB */
-                                        /*
-                                        try{
-                                            const endpoint = "/"
-                                            await axios.delete(endpoint, {
-                                                ID_Cita: appointmentID
+                                            return response.json();
                                             })
-
-
-                                        } catch (error){
-                                            console.log(error)
+                                            .catch((error) => {
+                                            console.error(`Error al cargar JSON desde ${url}:`, error);
+                                            throw error; // Relanzar el error para manejo posterior si es necesario
+                                            });
                                         }
-                                        */
-
-                                        const child = document.getElementById("Cita-" + appointmentID)
-                                            container.removeChild(child)
-                                        
-                                    }
-
-                                    const loadAppointments = (appointments) => {
-                                        appointments.map(( appointment )=>{
-
-                                            const patientDiv = document.createElement("div");
-                                            patientDiv.className = appointmentCointainerClass
-                                            patientDiv.style = `width: ${cardWidth}px`
-                                            patientDiv.id = "Cita-" + appointment[0]
-                                            patientDiv.innerHTML = `
-                                                <div class="d-flex justify-content-around" style="width:${cardWidth}px">
-                                                    <p style="width:${cardWidth/5}px">${appointment[4] + " " + appointment[5]}</p> 
-                                                    <p style="width:${cardWidth/5}px">${appointment[3]}</p>
-                                                    <p style="width:${cardWidth/5}px">${appointment[1]}</p>
-                                                    <p style="width:${cardWidth/5}px">${appointment[2]}</p>
-                                                    <button onclick="deleteAppointment(${appointment[0]})" class="cancelButton">Cancelar cita</button>
-                                                </div>
-                                                    `;
-                                            container.appendChild(patientDiv);
-                                        })
-                                    }
-
-                                    const getMyAppointments = async() => {
-                                        /*
+                        
+                                        async function agregarCita(datosCita) {
                                         try {
-                                            const endpoint = ""
-                                            const response = await axios.get(endpoint);
-                                            console.log(response)
+                                            const response = await fetch("/api/doctor/appointments", {
+                                            method: "POST",
+                                            headers: {
+                                                "Content-Type": "application/json",
+                                            },
+                                            body: JSON.stringify(datosCita),
+                                            });
+                        
+                                            if (!response.ok) {
+                                            throw new Error(`HTTP error! status: ${response.status}`);
+                                            }
+                        
+                                            const data = await response.json();
+                                            console.log("Cita agregada con éxito, ID:", data.insertedId);
+                                            return data.insertedId; // Devolver el ID de la cita insertada
                                         } catch (error) {
-                                            console.log("Error getting appointments from server ")
+                                            console.error("Error al agregar la cita:", error);
                                         }
-                                        */
-                                        
-                                    }
-
-                                    const appointmentsInitFunc = async() => {
-                                        //await getMyAppointments()
-                                        getMyAppointments()
-                                        loadAppointments(myAppointments)
-                                    }
-
-                                    appointmentsInitFunc()
-
-                                </script>
+                                        }
+                        
+                                        const newAppointment = async () => {
+                                        //Para insertar mensajes de error
+                                        const formularioCita =
+                                            document.getElementById("appointmentForm");
+                        
+                                        //Controladores de los inputs
+                                        const date = document.getElementById("Citas-Fecha");
+                                        const type = document.getElementById("Citas-Tipo");
+                                        const patientID = document.getElementById("Citas-ID_Paciente")
+                        
+                                        //Controlador del mensaje de error
+                                        const errorMessage = document.getElementById("Citas-Mensaje");
+                        
+                                        //Si los campos estan llenos
+                                        if (date.value && type.value && patientID.value) {
+                                            const response = await loadJSON(updateAppointmentURL);
+                                            const appointments = response.data;
+                                            //console.log(appointments[0].IDDoctor);
+                                            const jsonAppointment = {
+                                            IDPaciente: patientID.value,
+                                            IDDoctor: idDoctor,
+                                            TipoCita: type.value,
+                                            EstatusCita: "Agendada",
+                                            Fecha: date.value,
+                                            };
+                                            agregarCita(jsonAppointment).then((insertedId) => {
+                                            if (insertedId) {
+                                                const newAppointment = document.createElement("div");
+                                                newAppointment.className = appointmentCointainerClass;
+                                                newAppointment.style = `width: ${cardWidth}px`;
+                                                newAppointment.id = "Cita-" + insertedId;
+                                                newAppointment.innerHTML = `
+                                                        <div class="d-flex justify-content-around" style="width:${cardWidth}px">
+                                                            <p style="width:${
+                                                                cardWidth / 5
+                                                            }px">Jose Jimenez</p> 
+                                                            <p style="width:${cardWidth / 5}px">${
+                                                date.value
+                                                }</p>
+                                                            <p style="width:${cardWidth / 5}px">${
+                                                type.value
+                                                }</p>
+                                                            <p style="width:${
+                                                                cardWidth / 5
+                                                            }px">Por confirmar</p>
+                                                            <button onclick="deleteAppointment(${insertedId})" class="cancelButton">Cancelar cita</button>
+                                                        </div>
+                                                    `;
+                                                container.appendChild(newAppointment);
+                        
+                                                date.value = "";
+                                                type.value = "";
+                                                patientID.value = "";
+                                            }
+                                            });
+                                        } else {
+                                            errorMessage.innerHTML = "Rellene todos los campos";
+                                        }
+                                        };
+                                        async function eliminarCita(idCita) {
+                                        try {
+                                            const response = await fetch(
+                                            "/api/paciente/appointments/" + idCita,
+                                            {
+                                                method: "DELETE",
+                                            }
+                                            );
+                        
+                                            if (!response.ok) {
+                                            throw new Error(`HTTP error! status: ${response.status}`);
+                                            }
+                        
+                                            const data = await response.json();
+                                            console.log(data.message);
+                                            // Aquí puedes manejar la respuesta, como actualizar la interfaz de usuario
+                                        } catch (error) {
+                                            console.error("Error al eliminar la cita:", error);
+                                        }
+                                        }
+                        
+                                        const deleteAppointment = async (appointmentID) => {
+                                        await eliminarCita(appointmentID);
+                                        const child = document.getElementById("Cita-" + appointmentID);
+                                        container.removeChild(child);
+                                        };
+                        
+                                        const loadAppointments = async () => {
+                                        const response = await loadJSON(updateAppointmentURL);
+                                        const appointments = response.data;
+                                        appointments.map((appointment) => {
+                                            const patientDiv = document.createElement("div");
+                                            patientDiv.className = appointmentCointainerClass;
+                                            patientDiv.style = `width: ${cardWidth}px`;
+                                            patientDiv.id = "Cita-" + appointment.IDCita;
+                                            patientDiv.innerHTML = `
+                                            <div class="d-flex justify-content-around" style="width:${cardWidth}px">
+                                            <p style="width:${cardWidth / 5}px">${
+                                            appointment.Nombre + " " + appointment.Apellido
+                                            }</p> 
+                                            <p style="width:${cardWidth / 5}px">${appointment.Fecha}</p>
+                                            <p style="width:${cardWidth / 5}px">${
+                                            appointment.TipoCita
+                                            }</p>
+                                            <p style="width:${cardWidth / 5}px">${
+                                            appointment.EstatusCita
+                                            }</p>
+                                            <button onclick="deleteAppointment(${
+                                                appointment.IDCita
+                                            })" class="cancelButton">Cancelar cita</button></div>
+                                            `;
+                                            container.appendChild(patientDiv);
+                                        });
+                                        };
+                        
+                                        loadAppointments();
+                                    </script>
 
                             </div>
                             <br>
