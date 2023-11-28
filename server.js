@@ -46,6 +46,37 @@ app.get('/api/data', (req, res) => {
     res.json({ data: results });
   });
 });
+// Define a test API to fetch data from MySQL
+app.get('/api/data', (req, res) => {
+  pool.query('SELECT * FROM personasapoyo', (error, results, fields) => {
+    if (error) {
+      return res.status(500).json({ error: 'Database query error' });
+    }
+    res.json({ data: results });
+  });
+});
+
+app.get('/api/persona-apoyo/contactos:id', (req, res) =>{
+  const idPersonaApoyo = req.params.id;
+  const query = 'SELECT Distinct pacientes.IDPaciente, pacientes.Nombre, pacientes.Apellido, pacientes.Padecimento, pacientes.EstatusPaciente FROM pacientes, asignaciones, personasapoyo WHERE pacientes.IDPaciente = asignaciones.IDPaciente AND asignaciones.IDPersonaApoyo = ?';
+  pool.query(query, [idPersonaApoyo], (error, results, fields) => {
+    if (error) {
+      return res.status(500).json({ error: 'Database query error' });
+    }
+    res.json({ data: results });
+  });
+});
+
+app.get('/api/persona-apoyo/user:id', (req, res) =>{
+  const idPersonaApoyo = req.params.id;
+  const query = 'SELECT Nombre from personasapoyo where IDPersonaApoyo = ?';
+  pool.query(query, [idPersonaApoyo], (error, results, fields) => {
+    if (error) {
+      return res.status(500).json({ error: 'Database query error' });
+    }
+    res.json({ data: results });
+  });
+});
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/login.html'));
