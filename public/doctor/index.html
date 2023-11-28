@@ -22,6 +22,10 @@
 
         <!--Cripto -->
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+
+        <!-- Axios (Para peticiones HTTP) -->
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
     
     </head>
 
@@ -176,26 +180,32 @@
                             <div id="Appointments" class="col-sm-12 text-left" style="max-height: 250px; overflow-y: scroll;">
                                 <br>
 
+                                <!-- Indicador de valores de cada columna -->
+                                <div class="d-flex justify-content-between" style="width: 800px;">
+                                    <p style="width: 160px;"><b>Paciente</b></p>
+                                    <p style="width: 160px;"><b>&emsp;Fecha</b></p>
+                                    <p style="width: 160px;"><b>&emsp;Tipo</b></p>
+                                    <p style="width: 160px;"><b>&emsp;Estatus</b></p>
+                                    <p style="width: 160px;"></p>
+                                </div>
+
                                 <!--Carga y muestra las citas-->
                                 <script>
 
                                     const doctorID = ""     //Falta como obtenerlo al momento de hacer el log-in
-                                    const campos = "c.IDCita, c.TipoCita, c.EstatusCita, c.Fecha, p.Nombre, p.Apellido"
-                                    const query= `SELECT ${campos} FROM citas c, pacientes p  WHERE 
-                                    c.IDPaciente=p.IDPaciente AND c.IDDoctor=${doctorID};`
 
                                     //Señalan a donde debe añadir las nuevas citas
                                     const container = document.getElementById("Appointments")
                                     const appointmentCointainerClass = "card"
                                     const cardWidth = 800
 
-                                    const myAppointments = [
+                                    let myAppointments = [
                                         ["1", "Revision", "Por confirmar", "2023-01-01", "Roberto", "Jimenez"],
                                         ["2", "Cirujia", "Confirmada", "2023-01-05", "Ana", "Gutierrez"],
                                         ["3", "Tratamiento", "Postergada", "2023-01-10", "Jose", "Gonzalez"]
                                     ]   //Falta fetch de las citas
 
-                                    const newAppointment = () =>{
+                                    const newAppointment = async() =>{
                                         
                                         //Para insertar mensajes de error 
                                         const formularioCita = document.getElementById("appointmentForm")
@@ -212,8 +222,9 @@
                                         if(patientID.value && date.value && type.value){
 
                                             //Falta verificar la info de la BD para saber si existe el paciente 
-                                            const checkIDquery = `SELECT nombre, apellido FROM pacientes WHERE IDPaciente=${patientID.value};`
-                                            const exists = 1 
+                                            const endpoint1 = "/"
+                                            //const exists =  axios.get(endpoint1)
+                                            const exists = 1
 
                                             //Si existe el paciente
                                             if(exists){
@@ -223,8 +234,8 @@
                                                 const ID = cyrb53(patientID.value + doctorID.value + type.value);
 
                                                 //Falta insertarlo en la BD
-                                                const query = `INSERT INTO citas VALUES(${ID}, ${patientID.value}, ${doctorID}, ${type.value}, "Por confirmar", ${date.value});`
-                                    
+                                                const endpoint2 = "/"
+                                                //await axios.post(endpoint2, {}})
                                                 
                                                 const newAppointment = document.createElement("div");
                                                 newAppointment.className = appointmentCointainerClass
@@ -257,17 +268,25 @@
                                         }
                                     }
 
-                                    const deleteAppointment = (appointmentID) => {
-                                        const query = `DELETE FROM citas WHERE IDCita=${appointmentID};`    //Falta ejecutar el query
-
+                                    const deleteAppointment = async(appointmentID) => {
+                                        
+                                        /* For DB */
                                         /*
-                                        fetch()
-                                            .then()
-                                            .then()
+                                        try{
+                                            const endpoint = "/"
+                                            await axios.delete(endpoint, {
+                                                ID_Cita: appointmentID
+                                            })
+
+
+                                        } catch (error){
+                                            console.log(error)
+                                        }
                                         */
 
                                         const child = document.getElementById("Cita-" + appointmentID)
-                                        container.removeChild(child)
+                                            container.removeChild(child)
+                                        
                                     }
 
                                     const loadAppointments = (appointments) => {
@@ -290,7 +309,26 @@
                                         })
                                     }
 
-                                    loadAppointments(myAppointments)
+                                    const getMyAppointments = async() => {
+                                        /*
+                                        try {
+                                            const endpoint = ""
+                                            const response = await axios.get(endpoint);
+                                            console.log(response)
+                                        } catch (error) {
+                                            console.log("Error getting appointments from server ")
+                                        }
+                                        */
+                                        
+                                    }
+
+                                    const appointmentsInitFunc = async() => {
+                                        //await getMyAppointments()
+                                        getMyAppointments()
+                                        loadAppointments(myAppointments)
+                                    }
+
+                                    appointmentsInitFunc()
 
                                 </script>
 
@@ -305,7 +343,171 @@
                             <br>
 
                             <div id="Events" class="col-sm-12 text-left">
-                                <p>Hola</p>
+
+                                <div id="AvailableEvents">
+                                    <h5>&emsp;Eventos disponibles</h5>
+                                    <div id="AvailableEventsContainer" style="width: 920px;height: 330px; overflow:auto;">
+                                    </div>
+                                </div>
+                                <br>
+
+                                <div id="MyEvents">
+                                    <h5>&emsp;Eventos programados</h5>
+                                    <div id="MyEventsContainer" style="width: 920px;height: 330px; overflow:auto;">
+                                    </div>
+                                </div>
+                                
+                                <script>
+
+                                    /* Contenedores de los eventos */
+                                    const availableEventsContainer = document.getElementById("AvailableEventsContainer")
+                                    const myEventsContainer = document.getElementById("MyEventsContainer")
+
+                                    const eventClassName = "card"
+
+                                    let availableEvents = [
+                                    /*   ID         Nombre              Lugar       Fecha            Descripcion                        Estatus*/
+                                        ["1", "Reunion de doctores", "Auditorio", "2024-01-01",  "Todos los doctores de Kokua se veran", "Pospuesto"],
+                                        ["3", "Conoce a Julion Alvarez", "Auditorio", "2024-01-03",  "Concierto de Julion", "A tiempo"],
+                                        ["4", "Conoce nuestros procesos", "RR.HH", "2024-01-04",  "Conoceras el proceso administrativo que tenemos", "A tiempo"],
+                                        ["6", "Visita escolar: UP", "Auditorio", "2024-01-06",  "Vendran alumnos de la UP a conocernos", "A tiempo"]
+                                    ]
+
+                                    let myEvents = [
+                                        ["2", "Convivencia con pacientes", "Patio", "2024-01-02",  "Todos los doctores conviviran con sus pacientes", "A tiempo"],
+                                        ["5", "Dia tecnologico: Da Vinci", "Auditorio", "2024-01-05",  "Conoce al celebre robot Da Vinci", "Cancelado"],
+                                        ["7", "Convivencia con RR.HH", "RR.HH", "2024-01-07",  "Convivencia con otras areas de Kokua: RR.HH", "A tiempo"],
+                                        ["8", "Comida para los doctores", "Comedor principal", "2024-01-08",  "Comida para celebrar tu esfuerzo", "Pospuesto"]
+                                    ]
+
+                                    const generateAvailableCard = (event) =>{
+                                        const eventCard = document.createElement("div")
+                                        eventCard.id = "Evento-" + event[0]
+                                        eventCard.className = eventClassName
+                                        eventCard.style = "height: 330px;width: 300px;display: inline-block;"
+                                        eventCard.innerHTML = `
+                                            <div class="scrollY1">
+                                                <h4>${event[1]}</h4>
+                                            </div>
+                                            <br>
+                                            <p><b>Lugar: </b>${event[2]}</p>
+                                            <p><b>Fecha: </b>${event[3]}</p>
+                                            <div class="scrollY2">
+                                                <p><b>Descripcion:</b> ${event[4]}</p>
+                                            </div>
+                                            <p><b>Estatus: </b>${event[5]}</p>
+                                            <button class="purpleButton" onClick="changeEventHandler(${event[0]})">Reservar</button>
+                                        `
+                                        return eventCard
+                                    }
+                                    const generateMyCard = (event) =>{
+                                        const eventCard = document.createElement("div")
+                                        eventCard.id = "Evento-" + event[0]
+                                        eventCard.className = eventClassName
+                                        eventCard.style = "height: 330px;width: 300px;display: inline-block;"
+                                        eventCard.innerHTML = `
+                                            <div class="scrollY1">
+                                                <h4>${event[1]}</h4>
+                                            </div>
+                                            <br>
+                                            <p><b>Lugar: </b>${event[2]}</p>
+                                            <p><b>Fecha: </b>${event[3]}</p>
+                                            <div class="scrollY2">
+                                                <p><b>Descripcion:</b> ${event[4]}</p>
+                                            </div>
+                                            <p><b>Estatus: </b>${event[5]}</p>
+                                            <button class="purpleButton" onClick="cancelEventHandler(${event[0]})">Cancelar</button>
+                                        `
+                                        return eventCard
+                                    }
+
+
+                                    //Getters a la BD
+                                    const getAvailableEvents = async() => {
+                                        try{
+                                            const endpoint = "/"
+                                            const response = await axios.get()
+                                        } catch (error) {
+                                            console.log("Error getting available events from server")
+                                        }
+                                    }
+                                    const getMyEvents = async() => {
+                                        try{
+                                            const endpoint = "/"
+                                            const response = await axios.get()
+                                        } catch (error) {
+                                            console.log("Error getting my events from server")
+                                        }
+                                    }
+
+                                    //Cargan los eventos en la pagina
+                                    const loadAvailableEvents = () => {
+                                        availableEvents.map((availableEvent)=> {
+                                            const eventCard = generateAvailableCard(availableEvent)
+                                            availableEventsContainer.appendChild(eventCard)
+                                        })
+                                    }
+                                    const loadMyEvents = () => {
+                                        myEvents.map((myEvent)=> {
+                                            const eventCard = generateMyCard(myEvent)
+                                            myEventsContainer.appendChild( eventCard )
+                                        })
+                                    }
+
+                                    //Permite cambiar un evento de disponible a mio
+                                    const changeEventHandler = async(id) => {
+                                        for(let i=0; i < availableEvents.length; i++){
+                                            if(availableEvents[i][0] == id){
+                                                const eventCard = document.getElementById("Evento-" + id)
+                                                availableEventsContainer.removeChild(eventCard)
+                                                const newCard = generateMyCard(availableEvents[i])
+                                                myEventsContainer.appendChild(newCard)
+                                                myEvents.push(availableEvents[i])
+
+                                                let aux = []
+                                                for(let j = 0; j < availableEvents.length; j++){
+                                                    if(j!=i){ aux.push(availableEvents[j]) }
+                                                }
+                                                availableEvents = aux
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    //Permite cancelar la asistencia
+                                    const cancelEventHandler = async(id) => {
+                                        for(let i=0; i < myEvents.length; i++){
+                                            if(myEvents[i][0] == id){
+                                                const eventCard = document.getElementById("Evento-" + id)
+                                                myEventsContainer.removeChild(eventCard)
+                                                const newCard = generateAvailableCard(myEvents[i])
+                                                availableEventsContainer.appendChild(newCard)
+                                                availableEvents.push(myEvents[i])
+
+                                                let aux = []
+                                                for(let j = 0; j < myEvents.length; j++){
+                                                    if(j!=i){ aux.push(myEvents[j]) }
+                                                }
+                                                myEvents = aux
+
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    const eventInitFunc = async() => {
+                                        //await getAvailableEvents()
+                                        //await getMyEvents()
+
+                                        loadAvailableEvents()
+                                        loadMyEvents()
+
+                                    }
+
+                                    eventInitFunc()
+
+                                </script>
+
                             </div>
                             <br>
 

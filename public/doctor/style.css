@@ -574,7 +574,6 @@ body {
 }
 /* Fin elemento colapse */
 
-
 /* Inicio Estilos Patient Clinical Record */
 .patientList{
   max-width: 1200px;
@@ -686,3 +685,35 @@ body {
 }
 
 
+/* Inicio estilos Eventos */
+.horizontal{
+  overflow: auto;
+
+}
+
+.horizontal div{
+  display: inline-block;
+}
+
+.scrollY1{
+  height: 70px;
+  text-align: center;
+  overflow: auto;
+}
+
+.scrollY2{
+  height: 70px;
+  text-align: left;
+  overflow: auto;
+}
+
+.purpleButton{
+  background-color:#685cfe;
+  color: #fff;
+  width: 300px;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Fin estilos Eventos */
