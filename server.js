@@ -14,11 +14,11 @@ app.use(bodyParser.json());
 
 // Set up the MySQL connection
 const pool = mysql.createPool({
-  host: 'kokua-srv.mysql.database.azure.com',
-  user: 'kokuamaster', // Your MySQL username
-  password: 'ingSoftwareUP2023', // Your MySQL password
+  host: process.env.SERVER_HOST,
+  user: process.env.SERVER_USER, // Your MySQL username
+  password: process.env.SERVER_PASSWORD, // Your MySQL password
   database: 'kokua', // Your MySQL database name
-  port: '3306',
+  port: process.env.SERVER_PORT,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
