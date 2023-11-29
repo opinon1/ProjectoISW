@@ -8,6 +8,14 @@ const userURL = '/api/persona-apoyo/user:id';
 const idToReplaceURL = 7; // El ID que quieres usar
 const updateduserURL = userURL.replace(':id', idToReplaceURL);
 
+const url = '/api/persona-apoyo/chat/:id';
+const URLchatsJSON = url.replace(':id', idToReplaceURL);
+
+const urlSend = '/api/persona-apoyo/chat/newMensaje';
+const urlSendNew = urlSend.replace(':id', idToReplaceURL);
+
+console.log(URLchatsJSON);
+
 console.log(updateduserURL);
 
 const urlPacientes = '/api/data';
@@ -27,39 +35,6 @@ function loadJSON(url) {
     });
 }
 
-const mensajes =
-  [
-    {
-      id: 1,
-      id_recpetor: 1,
-      id_emisor: 1,
-      mensaje:
-        [
-          { "tipo": "emisor", "mensaje": "Hola" },
-          { "tipo": "emisor", "mensaje": "Como has estado?" },
-          { "tipo": "emisor", "mensaje": "amigo" },
-          { "tipo": "receptor", "mensaje": "bien" },
-          { "tipo": "receptor", "mensaje": "gracias por preguntar" },
-          { "tipo": "emisor", "mensaje": "Hola" },
-          { "tipo": "emisor", "mensaje": "Como has estado?" },
-          { "tipo": "emisor", "mensaje": "amigo" },
-          { "tipo": "receptor", "mensaje": "bien" },
-          { "tipo": "receptor", "mensaje": "gracias por preguntar" }
-        ]
-    },
-
-    {
-      id: 2,
-      id_recpetor: 4,
-      id_emisor: 1,
-      mensaje: [
-        { "tipo": "emisor", "mensaje": "Hola" },
-        { "tipo": "emisor", "mensaje": "Como has estado Ferro?" },
-        { "tipo": "receptor", "mensaje": "bien" },
-        { "tipo": "receptor", "mensaje": "gracias por preguntar" }
-      ]
-    }
-  ]
 
 
 
@@ -120,6 +95,8 @@ const loadChatUser = async () => {
 const loadChatContacts = async () => {
   try {
     await loadChatUser();
+    const resp = await loadJSON(URLchatsJSON);
+    const jsonChats = resp.data;
     const card = document.getElementsByClassName('contact');
     console.log(card);
     const response = await loadJSON(updatedContactsURL);
@@ -128,11 +105,11 @@ const loadChatContacts = async () => {
     const jsonContacts = response.data;
     console.log(jsonContacts);
     jsonContacts.forEach(element => {
-      const conversaciones = mensajes.filter(m => m.id_recpetor === element.IDPaciente);
+      const conversaciones = jsonChats.filter(m => m.id_receptor === element.IDPaciente);
       let ultimoMensajeTexto = "No hay mensajes";
       if (conversaciones.length > 0) {
-        const ultimoMensaje = conversaciones.map(c => c.mensaje[c.mensaje.length - 1]).reduce((a, b) => (a > b ? a : b));
-        ultimoMensajeTexto = ultimoMensaje.mensaje;
+        const ultimoMensaje = conversaciones[conversaciones.length - 1].Mensaje;
+        ultimoMensajeTexto = ultimoMensaje;
       }
       let hora = new Date().toLocaleTimeString();
       const div = document.createElement("button");
@@ -161,11 +138,13 @@ const loadChatContacts = async () => {
 }
 
 //--------------------load messages---------------------------------------------------------------------
-const loadMessages = async (mensajes) => {
+const loadMessages = async () => {
   try {
     await loadChatContacts();
     const response = await loadJSON(updatedContactsURL);
-
+    const resp = await loadJSON(URLchatsJSON);
+    const jsonChats = resp.data;
+    console.log(jsonChats);
     // Obtener el primer elemento del array 'data', que contiene tus objetos
     const jsonContacts = response.data;
     const areaChat = document.getElementsByClassName("chats")[0];
@@ -188,6 +167,9 @@ const loadMessages = async (mensajes) => {
           return;
         }
 
+        // Establecer el atributo data-idpaciente en areaChat con el ID del paciente
+        areaChat.setAttribute('data-idpaciente', paciente.IDPaciente);
+
         // Crear y agregar el nombre en el área del chat
         const nombreElement = document.createElement('h3');
         nombreElement.innerText = name;
@@ -196,19 +178,22 @@ const loadMessages = async (mensajes) => {
         areaNombreChat.appendChild(document.createElement('hr'));
 
         // Filtrar y mostrar solo los mensajes para este paciente
-        mensajes.forEach(conversacion => {
-          console.log(conversacion);
-          if (conversacion.id_recpetor === paciente.IDPaciente) {
-            conversacion.mensaje.forEach(mensaje => {
-              const mensajeElement = document.createElement("p");
-              mensajeElement.innerText = mensaje.mensaje;
-              mensajeElement.className = mensaje.tipo === "receptor" ? "MensajeReceptor" : "MensajeEmisor";
-              areaChat.appendChild(mensajeElement);
-            });
+        jsonChats.forEach(conversacion => {
+          if (conversacion.id_receptor === paciente.IDPaciente || conversacion.id_emisor === paciente.IDPaciente) {
+            const mensajeElement = document.createElement("p");
+            mensajeElement.innerText = conversacion.Mensaje;
+            if (!(conversacion.tipo_emisor === 'PersonaApoyo')) {
+              mensajeElement.className = 'MensajeReceptor';
+            }
+            else {
+              mensajeElement.className = 'MensajeEmisor';
+            }
+            areaChat.appendChild(mensajeElement);
           }
         });
       });
     });
+
   } catch (error) {
     console.log(error);
   }
@@ -295,79 +280,60 @@ const loadClients = async () => {
 
 }
 
-//--------------------------notifications---------------------------------------------------------
-const loadNotifications = async (notifications) => {
+async function agregarMensaje(datosCita) {
   try {
-    const notificationArea = document.getElementById('notifications');
-
-    await notifications.forEach(el => {
-      const line = document.createElement('hr');
-      line.className = 'lineaNot';
-      const divTituloMensaje = document.createElement('div');
-      divTituloMensaje.className = 'notificacionTituloDescripcion';
-      const divHora = document.createElement('div');
-      divHora.className = 'divHoraNotificacion';
-      const divNotification = document.createElement('div');
-      divNotification.className = 'divNotificacion';
-      divNotification.setAttribute('data-id', el.id); // Asignar el ID de la notificación
-      const point = document.createElement('div');
-      point.className = 'ponitNotificacion';
-
-      const notification = document.createElement('p');
-      notification.innerText = el.notification;
-      notification.className = 'titleNotification';
-      const time = document.createElement('p');
-      time.innerText = el.time;
-      time.className = 'timeNotification';
-      const description = document.createElement('p');
-      description.innerText = el.description;
-      description.className = 'descriptionNotification';
-
-      const botonBorrar = document.createElement('button');
-      botonBorrar.innerHTML = '<ion-icon name="trash-outline"></ion-icon>';
-      botonBorrar.className = 'borrar';
-
-      divTituloMensaje.appendChild(point);
-      divTituloMensaje.appendChild(notification);
-      divTituloMensaje.appendChild(description);
-      divHora.appendChild(time);
-      divNotification.appendChild(divTituloMensaje);
-      divNotification.appendChild(divHora);
-      divNotification.appendChild(botonBorrar);  // Agrega el botón Borrar a la notificación
-      notificationArea.appendChild(line);
-      notificationArea.appendChild(divNotification);
-      notificationArea.appendChild(line);
-
-
-      botonBorrar.addEventListener('click', function (event) {
-        const notificationId = divNotification.getAttribute('data-id');
-        console.log(notificationId);
-        divNotification.classList.add('desvanecer');
-        divNotification.addEventListener('animationend', function () {
-          divNotification.remove();
-
-          // Realizar la petición HTTP DELETE (comentada por ahora)
-          /*
-          fetch('https://tuapi.com/notifications/' + notificationId, {
-            method: 'DELETE'
-          })
-          .then(response => response.json())
-          .then(data => {
-            console.log('Notificación eliminada:', data);
-          })
-          .catch((error) => {
-            console.error('Error:', error);
-          });
-          */
-        });
-      });
+    const response = await fetch('/api/persona-apoyo/chat/newMensaje', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(datosCita),
     });
 
-  } catch (error) {
-    console.log(error);
-  }
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
+    const data = await response.json();
+    console.log("Cita agregada con éxito, ID:", data.insertedId);
+    return data.insertedId; // Devolver el ID de la cita insertada
+  } catch (error) {
+    console.error("Error al agregar la cita:", error);
+  }
 }
+
+const sendMessage = async () => {
+  const areaChat = document.getElementsByClassName("chats")[0];
+
+  // Obtener el valor de data-idpaciente
+  const idPaciente = areaChat.getAttribute('data-idpaciente');
+
+  if (idPaciente) {
+    console.log("ID del Paciente:", idPaciente);
+
+    const message = document.getElementById('textFieldM');
+    const mensaje = message.value;
+    const JSONMensaje = {
+      id_receptor: idPaciente,
+      id_emisor: 7,
+      Mensaje: mensaje,
+      tipo_emisor: "PersonaApoyo",
+      tipo_receptor: "Paciente"
+    }
+    await agregarMensaje(JSONMensaje);
+
+    const mensajeElement = document.createElement("p");
+    mensajeElement.innerText = mensaje;
+    mensajeElement.className = 'MensajeEmisor';
+    areaChat.appendChild(mensajeElement);
+    document.getElementById('textFieldM').value = '';
+
+  } else {
+    console.log("No se seleccionó ningún paciente.");
+    // Manejar el caso en el que no se haya seleccionado ningún paciente
+  }
+}
+
 
 
 
@@ -376,10 +342,9 @@ const loadNotifications = async (notifications) => {
 //-------------------------------DOM---------------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', function () {
   loadSideBar();
-  loadMessages(mensajes);
+  loadMessages();
   searchBar();
   loadClients();
-  loadNotifications(notifications);
 
   /*
    Promise.all([

@@ -81,7 +81,7 @@
     <!-----------------------------------------Chat---------------------------------------------------------->
         <div id = "chat" class="content">
             <div class = row>
-            <div class = "col-sm-3 sideChat">
+            <div class = "col-lg-3 sideChat">
             <!--------------------------------------sideChat---------------------------------------------------->
                 <div>
                 <br>
@@ -100,11 +100,61 @@
                 </div>
             </div>
             <!--------------------------------------ChatArea---------------------------------------------------->
-            <div class = "col-sm-9">
+            <div class = "col-lg-9">
                 <div class = "chatArea">
                 <div class = "nombreChat"></div>
                 <div class = "chats"></div>
-                <input name = "send" placeholder=" Enviar mensaje" class = "sendMessage"></input>
+                    <input name = "send" placeholder=" Enviar mensaje" class = "sendMessage" id = 'textFieldM'></input>
+                    <button onclick="sendM()" class = "BotonEnviar">Enviar</button>
+                    <script>
+                          async function agregarMensaje(datosCita) {
+                                try {
+                                const response = await fetch('/api/persona-apoyo/chat/newMensaje', {
+                                    method: "POST",
+                                    headers: {
+                                    "Content-Type": "application/json",
+                                    },
+                                    body: JSON.stringify(datosCita),
+                                });
+
+                                if (!response.ok) {
+                                    throw new Error(`HTTP error! status: ${response.status}`);
+                                }
+
+                                const data = await response.json();
+                                console.log("Cita agregada con éxito, ID:", data.insertedId);
+                                return data.insertedId; // Devolver el ID de la cita insertada
+                                } catch (error) {
+                                console.error("Error al agregar la cita:", error);
+                                }
+                            }
+                        const sendM = async () => {
+                            const areaChat = document.getElementsByClassName("chats")[0];
+
+                            // Obtener el valor de data-idpaciente
+                            const idPaciente = areaChat.getAttribute('data-idpaciente');
+
+
+                            console.log("ID del Paciente:", idPaciente);
+
+                            const message = document.getElementById('textFieldM');
+                            const mensaje = message.value;
+                            const JSONMensaje = {
+                                id_receptor: 7,
+                                id_emisor: 38,
+                                Mensaje: mensaje,
+                                tipo_emisor: "Paciente",
+                                tipo_receptor: "PersonaApoyo"
+                            }
+                            await agregarMensaje(JSONMensaje);
+
+                            const mensajeElement = document.createElement("p");
+                            mensajeElement.innerText = mensaje;
+                            mensajeElement.className = 'MensajeEmisor';
+                            areaChat.appendChild(mensajeElement);
+                            document.getElementById('textFieldM').value = '';
+                        }
+                    </script>
                 </div>
             </div>
             </div>

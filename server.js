@@ -275,6 +275,34 @@ app.patch('/api/doctor/cita/modificar/:id', async (req, res) => {
   }
 });
 
+
+//----------------------------------------------Chat----------------------------------
+app.get('/api/persona-apoyo/chat/:id', (req, res) => {
+  const idPersona = req.params.id;
+  console.log(idPersona);
+  const query = 'SELECT * FROM mensajes WHERE id_emisor = ? or id_receptor = ?';
+  pool.query(query, [idPersona, idPersona], (error, results, fields) => {
+    if (error) {
+      return res.status(500).json({ error: 'Database query error' });
+    }
+    res.json({ data: results });
+  });
+});
+
+app.post('/api/persona-apoyo/chat/newMensaje', (req, res) => {
+  const nuevaCita = req.body; // Datos de la nueva cita
+  console.log(nuevaCita.IDPaciente);
+
+  const query = 'INSERT INTO Mensajes (id_receptor, id_emisor, Mensaje, tipo_emisor, tipo_receptor) VALUES (?, ?, ?, ?, ?)';
+  pool.query(query, [nuevaCita.id_receptor, nuevaCita.id_emisor, nuevaCita.Mensaje, nuevaCita.tipo_emisor, nuevaCita.tipo_receptor], (error, results, fields) => {
+    if (error) {
+      return res.status(500).json({ error: 'Error al insertar la cita' });
+    }
+    // Enviar una respuesta con el ID de la cita insertada
+    res.json({ message: 'Cita insertada con éxito', insertedId: results.insertId });
+  });
+});
+
 //-----------------------------------------------Fin back------------------------------
 
 app.get('/', (req, res) => {

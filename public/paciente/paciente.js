@@ -14,6 +14,12 @@ const updateseguimientoURL = SeguimientoURL.replace(':id', idToReplace);
 
 const urlPacientes = '/api/data';
 
+const url = '/api/persona-apoyo/chat/:id';
+const URLchatsJSON = url.replace(':id', idToReplace);
+
+const urlSend = '/api/persona-apoyo/chat/newMensaje';
+const urlSendNew = urlSend.replace(':id', idToReplace);
+
 // Función para cargar un archivo JSON usando fetch
 function loadJSON(url) {
   return fetch(url)
@@ -29,67 +35,7 @@ function loadJSON(url) {
     });
 }
 
-const notifications =
-  [
-    {
-      id: 1,
-      notification: "Hola",
-      description: "Alguien te ha dicho hola",
-      time: "1hr ago"
-    },
-    {
-      id: 2,
-      notification: "Hola",
-      description: "Alguien te ha dicho hola",
-      time: "1hr ago"
-    },
-    {
-      id: 3,
-      notification: "Hola",
-      description: "Alguien te ha dicho hola",
-      time: "1hr ago"
-    },
-    {
-      id: 4,
-      notification: "Hola",
-      description: "Alguien te ha dicho hola",
-      time: "1hr ago"
-    }
-  ]
 
-const mensajes =
-  [
-    {
-      id: 1,
-      id_recpetor: 1,
-      id_emisor: 1,
-      mensaje:
-        [
-          { "tipo": "emisor", "mensaje": "Hola" },
-          { "tipo": "emisor", "mensaje": "Como has estado?" },
-          { "tipo": "emisor", "mensaje": "amigo" },
-          { "tipo": "receptor", "mensaje": "bien" },
-          { "tipo": "receptor", "mensaje": "gracias por preguntar" },
-          { "tipo": "emisor", "mensaje": "Hola" },
-          { "tipo": "emisor", "mensaje": "Como has estado?" },
-          { "tipo": "emisor", "mensaje": "amigo" },
-          { "tipo": "receptor", "mensaje": "bien" },
-          { "tipo": "receptor", "mensaje": "gracias por preguntar" }
-        ]
-    },
-
-    {
-      id: 2,
-      id_recpetor: 2,
-      id_emisor: 1,
-      mensaje: [
-        { "tipo": "emisor", "mensaje": "Hola" },
-        { "tipo": "emisor", "mensaje": "Como has estado Ferro?" },
-        { "tipo": "receptor", "mensaje": "bien" },
-        { "tipo": "receptor", "mensaje": "gracias por preguntar" }
-      ]
-    }
-  ]
 
 
 
@@ -120,6 +66,8 @@ const loadChatUser = async () => {
 //---------------------------chatContacts------------------------------------------------------------------
 const loadChatContacts = async () => {
   try {
+    const resp = await loadJSON(URLchatsJSON);
+    const jsonChats = resp.data;
     await loadChatUser();
     const card = document.getElementsByClassName('contact')[0];
     const response = await loadJSON(updatedContactsURL);
@@ -127,72 +75,41 @@ const loadChatContacts = async () => {
     console.log(jsonContacts);
 
     // Decide si mostrar nombre de doctor o de persona de apoyo
-    let nombreCompletoDoctor = nombreCompleto = `${jsonContacts[0].NombreDoctor} ${jsonContacts[0].ApellidoDoctor}`;
     let nombreCompletoApoyo = nombreCompleto = `${jsonContacts[0].PersonaApoyoNombre} ${jsonContacts[0].PersonaApoyoApellido}`;
-    let ultimoMensajeTexto1 = "No hay mensajes";
-    const conversaciones1 = mensajes.filter(m => m.id_recpetor === jsonContacts[0].IDDoctor);
-
-    if (conversaciones1.length > 0) {
-      const ultimoMensaje = conversaciones1.map(c => c.mensaje[c.mensaje.length - 1])
-        .reduce((a, b) => (a.fecha > b.fecha ? a : b));
-      ultimoMensajeTexto1 = ultimoMensaje.mensaje;
-    }
-
     let ultimoMensajeTexto2 = "No hay mensajes";
-    const conversaciones2 = mensajes.filter(m => m.id_recpetor === jsonContacts[0].IDPersonaApoyo);
+    const conversaciones2 = jsonChats.filter(m => m.id_recpetor === jsonContacts[0].IDPersonaApoyo);
 
     if (conversaciones2.length > 0) {
-      const ultimoMensaje = conversaciones1.map(c => c.mensaje[c.mensaje.length - 1])
+      const ultimoMensaje = conversaciones2.map(c => c.mensaje[c.mensaje.length - 1])
         .reduce((a, b) => (a.fecha > b.fecha ? a : b));
       ultimoMensajeTexto2 = ultimoMensaje.mensaje;
     }
 
     let hora = new Date().toLocaleTimeString();
     const div1 = document.createElement("button");
-    const div2 = document.createElement("button");
     const divNombre1 = document.createElement("div");
-    const divNombre2 = document.createElement("div");
-    const nombreDoctor = document.createElement("h6");
     const nombrePersonaApoyo = document.createElement("h6");
     const fecha1 = document.createElement("p");
-    const fecha2 = document.createElement("p");
     const mensaje1 = document.createElement("p"); 2
-    const mensaje2 = document.createElement("p");
     const salto1 = document.createElement("br");
-    const salto2 = document.createElement("br");
 
-    mensaje1.innerText = ultimoMensajeTexto1;
+    mensaje1.innerText = ultimoMensajeTexto2;
     mensaje1.className = "ultimoMensaje";
     mensaje1.appendChild(salto1);
-    mensaje2.innerText = ultimoMensajeTexto2;
-    mensaje2.className = "ultimoMensaje";
-    mensaje2.appendChild(salto2);
-    nombreDoctor.innerText = nombreCompletoDoctor;
     nombrePersonaApoyo.innerText = nombreCompletoApoyo;
     fecha1.innerText = hora;
-    fecha2.innerText = hora;
     div1.className = 'contactArea';
-    div2.className = 'contactArea';
-    nombreDoctor.className = 'nombreContacto';
     nombrePersonaApoyo.className = 'nombreContacto';
     fecha1.className = 'fechaContacto';
-    fecha2.className = 'fechaContacto';
-    div1.setAttribute('data-id', jsonContacts[0].IDDoctor);
+    div1.setAttribute('data-id', jsonContacts[0].IDPersonaApoyo);
     div1.setAttribute('data-type', 'doctor');
-    div2.setAttribute('data-id', jsonContacts[0].IDPersonaApoyo);
-    div2.setAttribute('data-type', 'apoyo');
 
-    divNombre1.appendChild(nombreDoctor);
+    divNombre1.appendChild(nombrePersonaApoyo);
     divNombre1.appendChild(mensaje1);
     div1.appendChild(divNombre1);
     div1.appendChild(fecha1);
     card.appendChild(div1);
 
-    divNombre2.appendChild(nombrePersonaApoyo);
-    divNombre2.appendChild(mensaje2);
-    div2.appendChild(divNombre2);
-    div2.appendChild(fecha2);
-    card.appendChild(div2);
   } catch (error) {
     console.log(error);
   }
@@ -200,46 +117,55 @@ const loadChatContacts = async () => {
 
 
 //--------------------load messages---------------------------------------------------------------------
-const loadMessages = async (mensajes) => {
+const loadMessages = async () => {
   try {
     await loadChatContacts();
+    const response = await loadJSON(updatedContactsURL);
+    const resp = await loadJSON(URLchatsJSON);
+    const jsonChats = resp.data;
+    console.log(jsonChats);
+    // Obtener el primer elemento del array 'data', que contiene tus objetos
+    const jsonContacts = response.data;
     const areaChat = document.getElementsByClassName("chats")[0];
     const areaNombreChat = document.getElementsByClassName("nombreChat")[0];
     let contactos = document.querySelectorAll('.contactArea');
 
     contactos.forEach(contacto => {
       contacto.addEventListener('click', function (event) {
+        // Limpiar áreas de chat y nombre del chat
         areaChat.innerHTML = '';
         areaNombreChat.innerHTML = '';
 
-        const idContacto = contacto.getAttribute('data-id');
-        const tipoContacto = contacto.getAttribute('data-type');
-        console.log("ID Contacto:", idContacto, "Tipo:", tipoContacto);
+        // Obtener el nombre del contacto clickeado
+        const name = contacto.querySelector('h6').textContent;
 
+        // Crear y agregar el nombre en el área del chat
         const nombreElement = document.createElement('h3');
-        nombreElement.innerText = contacto.querySelector('h6').textContent;
+        nombreElement.innerText = name;
         nombreElement.className = "NombreChat";
         areaNombreChat.appendChild(nombreElement);
         areaNombreChat.appendChild(document.createElement('hr'));
 
-        let conversaciones = mensajes.filter(m => m.id_recpetor === parseInt(idContacto));
-        console.log("Conversaciones filtradas:", conversaciones);
-
-        conversaciones.forEach(conversacion => {
-          conversacion.mensaje.forEach(mensaje => {
-            const mensajeElement = document.createElement("p");
-            mensajeElement.innerText = mensaje.mensaje;
-            mensajeElement.className = mensaje.tipo === "receptor" ? "MensajeReceptor" : "MensajeEmisor";
-            areaChat.appendChild(mensajeElement);
-          });
+        // Filtrar y mostrar solo los mensajes para este paciente
+        jsonChats.forEach(conversacion => {
+          const mensajeElement = document.createElement("p");
+          mensajeElement.innerText = conversacion.Mensaje;
+          console.log(conversacion.Mensaje);
+          if (conversacion.tipo_emisor === 'PersonaApoyo') {
+            mensajeElement.className = 'MensajeReceptor';
+          }
+          else {
+            mensajeElement.className = 'MensajeEmisor';
+          }
+          areaChat.appendChild(mensajeElement);
         });
       });
     });
+
   } catch (error) {
     console.log(error);
   }
 };
-
 
 
 
@@ -267,67 +193,6 @@ const searchBar = async () => {
   }
 }
 
-
-
-//--------------------------notifications---------------------------------------------------------
-const loadNotifications = async (notifications) => {
-  try {
-    const notificationArea = document.getElementById('notifications');
-
-    await notifications.forEach(el => {
-      const line = document.createElement('hr');
-      line.className = 'lineaNot';
-      const divTituloMensaje = document.createElement('div');
-      divTituloMensaje.className = 'notificacionTituloDescripcion';
-      const divHora = document.createElement('div');
-      divHora.className = 'divHoraNotificacion';
-      const divNotification = document.createElement('div');
-      divNotification.className = 'divNotificacion';
-      divNotification.setAttribute('data-id', el.id); // Asignar el ID de la notificación
-      const point = document.createElement('div');
-      point.className = 'ponitNotificacion';
-
-      const notification = document.createElement('p');
-      notification.innerText = el.notification;
-      notification.className = 'titleNotification';
-      const time = document.createElement('p');
-      time.innerText = el.time;
-      time.className = 'timeNotification';
-      const description = document.createElement('p');
-      description.innerText = el.description;
-      description.className = 'descriptionNotification';
-
-      const botonBorrar = document.createElement('button');
-      botonBorrar.innerHTML = '<ion-icon name="trash-outline"></ion-icon>';
-      botonBorrar.className = 'borrar';
-
-      divTituloMensaje.appendChild(point);
-      divTituloMensaje.appendChild(notification);
-      divTituloMensaje.appendChild(description);
-      divHora.appendChild(time);
-      divNotification.appendChild(divTituloMensaje);
-      divNotification.appendChild(divHora);
-      divNotification.appendChild(botonBorrar);  // Agrega el botón Borrar a la notificación
-      notificationArea.appendChild(line);
-      notificationArea.appendChild(divNotification);
-      notificationArea.appendChild(line);
-
-
-      botonBorrar.addEventListener('click', function (event) {
-        const notificationId = divNotification.getAttribute('data-id');
-        console.log(notificationId);
-        divNotification.classList.add('desvanecer');
-        divNotification.addEventListener('animationend', function () {
-          divNotification.remove();
-        });
-      });
-    });
-
-  } catch (error) {
-    console.log(error);
-  }
-
-}
 
 //-----------------------------------------------Servicios Extra----------------------------------------------
 const serviciosExtraLoad = async () => {
@@ -507,12 +372,15 @@ const seguimientoLoad = async () => {
   });
 
 
+
+
+
+
 }
 //-------------------------------DOM---------------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', function () {
-  loadMessages(mensajes);
+  loadMessages();
   searchBar();
-  loadNotifications(notifications);
   serviciosExtraLoad();
   seguimientoLoad();
 
