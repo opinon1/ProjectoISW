@@ -1,11 +1,11 @@
 //------------------------------Jsons------------------------------------------------------------------
 
 const contactsURL = '/api/persona-apoyo/contactos:id';
-const idToReplace = 7; // El ID que quieres usar
+const idToReplace = 1; // El ID que quieres usar
 const updatedContactsURL = contactsURL.replace(':id', idToReplace);
 
 const userURL = '/api/persona-apoyo/user:id';
-const idToReplaceURL = 7; // El ID que quieres usar
+const idToReplaceURL = 1; // El ID que quieres usar
 const updateduserURL = userURL.replace(':id', idToReplaceURL);
 
 const url = '/api/persona-apoyo/chat/:id';
