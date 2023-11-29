@@ -308,15 +308,14 @@ const sendMessage = async () => {
   // Obtener el valor de data-idpaciente
   const idPaciente = areaChat.getAttribute('data-idpaciente');
   const mensajeElement = document.createElement("p");
+  const message = document.getElementById('textFieldM');
+  const mensaje = message.value;
   mensajeElement.innerText = mensaje;
   mensajeElement.className = 'MensajeEmisor';
   areaChat.appendChild(mensajeElement);
   document.getElementById('textFieldM').value = '';
   if (idPaciente) {
     console.log("ID del Paciente:", idPaciente);
-
-    const message = document.getElementById('textFieldM');
-    const mensaje = message.value;
     const JSONMensaje = {
       id_receptor: idPaciente,
       id_emisor: 7,
