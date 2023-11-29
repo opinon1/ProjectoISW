@@ -307,7 +307,11 @@ const sendMessage = async () => {
 
   // Obtener el valor de data-idpaciente
   const idPaciente = areaChat.getAttribute('data-idpaciente');
-
+  const mensajeElement = document.createElement("p");
+  mensajeElement.innerText = mensaje;
+  mensajeElement.className = 'MensajeEmisor';
+  areaChat.appendChild(mensajeElement);
+  document.getElementById('textFieldM').value = '';
   if (idPaciente) {
     console.log("ID del Paciente:", idPaciente);
 
@@ -322,11 +326,7 @@ const sendMessage = async () => {
     }
     await agregarMensaje(JSONMensaje);
 
-    const mensajeElement = document.createElement("p");
-    mensajeElement.innerText = mensaje;
-    mensajeElement.className = 'MensajeEmisor';
-    areaChat.appendChild(mensajeElement);
-    document.getElementById('textFieldM').value = '';
+
 
   } else {
     console.log("No se seleccionó ningún paciente.");
