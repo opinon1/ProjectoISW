@@ -14,11 +14,11 @@ app.use(bodyParser.json());
 
 // Set up the MySQL connection
 const pool = mysql.createPool({
-  host: 'kokua-srv.mysql.database.azure.com',
-  user: 'kokuamaster', // Your MySQL username
-  password: 'ingSoftwareUP2023', // Your MySQL password
+  host: process.env.SERVER_HOST,
+  user: process.env.SERVER_USER, // Your MySQL username
+  password: process.env.SERVER_PASSWORD, // Your MySQL password
   database: 'kokua', // Your MySQL database name
-  port: '3306',
+  port: process.env.SERVER_PORT,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
@@ -219,34 +219,6 @@ app.delete('/api/doctor/appointments/:id', (req, res) => {
   });
 });
 
-//-----------------------------------------------Informacion doctor-----------
-
-app.get('/api/doctor/profile/:id', (req, res) =>{
-  const idDoctor = req.params.id;
-  console.log(idDoctor);
-  const query = 'SELECT * from doctores where IDDoctor = ?';
-  pool.query(query, [idDoctor], (error, results, fields) => {
-    if (error) {
-      return res.status(500).json({ error: 'Database query error' });
-    }
-    res.json({ data: results });
-  });
-});
-
-//------------------------------------------------Pacientes---------------------------
-
-app.get('/api/doctor/patients/:id', (req, res) =>{
-  const idDoctor = req.params.id;
-  console.log(idDoctor);
-  const query = 'SELECT pacientes.IDPaciente, pacientes.Nombre FROM pacientes, doctores, asignaciones WHERE pacientes.IDPaciente = asignaciones.IDPaciente AND asignaciones.IDDoctor = doctores.IDDoctor AND doctores.IDDoctor = ?';
-  pool.query(query, [idDoctor], (error, results, fields) => {
-    if (error) {
-      return res.status(500).json({ error: 'Database query error' });
-    }
-    res.json({ data: results });
-  });
-});
-
  //-----------------------------------------------Fin back------------------------------
 
 app.get('/', (req, res) => {
@@ -267,9 +239,8 @@ app.get('*', (req, res) => {
 
 
 
-
 // Start the server
-const PORT = 1234;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
